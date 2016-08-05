@@ -8,15 +8,13 @@ import java.util.Set;
 
 class CollectionPopulator {
 
-    static Collection<?> populate(Class<?> type) {
-        Collection<?> collection = new ArrayList<>();
-
-        if (type.isAssignableFrom(List.class)) {
-            collection = new ArrayList<>();
-        } else if (type.isAssignableFrom(Set.class)) {
-            collection = new HashSet<>();
+    static Collection<?> populate(Class<?> clazz) {
+        if (clazz.isAssignableFrom(List.class)) {
+            return new ArrayList<>();
+        } else if (clazz.isAssignableFrom(Set.class)) {
+            return new HashSet<>();
+        } else {
+            throw new IllegalArgumentException(clazz + " type not supported");
         }
-
-        return collection;
     }
 }

@@ -1,52 +1,82 @@
 package io.github.konohiroaki.deepinitializer;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class DeepInitializer {
 
-    public static <T> T initialize(Class<T> clazz) throws IllegalAccessException, InstantiationException {
-        T obj = clazz.newInstance();
-        for (Field field : getAllFields(clazz)) {
-            if (field.getType().isPrimitive()) {
-                continue;
-            }
-
-            if (String.class.isAssignableFrom(field.getType())) {
-                setProperty(obj, field, "");
-            } else if (field.getType().isEnum()) {
-                setProperty(obj, field, field.getType().getEnumConstants()[0]);
-            } else if (Collection.class.isAssignableFrom(field.getType())) {
-                setProperty(obj, field, CollectionPopulator.populate(field.getType()));
-            } else if (Map.class.isAssignableFrom(field.getType())) {
-                setProperty(obj, field, MapPopulator.populate());
-            } else {
-                setProperty(obj, field, initialize(field.getType()));
-            }
+    public static <T> T initialize(Class<T> clazz) {
+        if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
+            return (T) PrimitivePopulator.populate(clazz);
+        } else if (TypeUtils.isString(clazz)) {
+            return (T) StringPopulator.populate();
+        } else if (clazz.isEnum()) {
+            return (T) EnumPopulator.populate(clazz);
+        } else if (Collection.class.isAssignableFrom(clazz)) {
+            return (T) CollectionPopulator.populate(clazz);
+        } else if (Map.class.isAssignableFrom(clazz)) {
+            return (T) MapPopulator.populate();
+        } else {
+            return populateField(clazz);
         }
-        return obj;
+    }
+
+    private static <T> T initField(Field field) {
+        Class<?> clazz = field.getType();
+        if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
+            return (T) PrimitivePopulator.populate(field);
+        } else if (TypeUtils.isString(clazz)) {
+            return (T) StringPopulator.populate(field);
+        } else if (clazz.isEnum()) {
+            return (T) clazz.getEnumConstants()[0];
+        } else if (Collection.class.isAssignableFrom(clazz)) {
+            return (T) CollectionPopulator.populate(clazz);
+        } else if (Map.class.isAssignableFrom(clazz)) {
+            return (T) MapPopulator.populate();
+        } else {
+            return (T) populateField(field.getType());
+        }
+    }
+
+    private static <T> T populateField(Class<T> clazz) {
+        T value;
+        try {
+            value = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new IllegalArgumentException(clazz + " type not supported");
+        }
+        Set<Field> fields = getAllFields(clazz);
+        for (Field childField : fields) {
+            setProperty(value, childField, initField(childField));
+        }
+        return value;
     }
 
     private static Set<Field> getAllFields(Class<?> clazz) {
-        Set<Field> fields = new HashSet<>();
-
-        Collections.addAll(fields, clazz.getDeclaredFields());
-
+        Set<Field> fields = new HashSet<>(Arrays.asList(clazz.getDeclaredFields()));
         if (clazz.getSuperclass() != null) {
             fields.addAll(getAllFields(clazz.getSuperclass()));
         }
 
-        return fields;
+        return fields.stream()
+            .filter(field -> !field.isSynthetic())
+            .collect(Collectors.toSet());
     }
 
-    private static void setProperty(Object object, Field field, Object value) throws IllegalAccessException {
+    private static void setProperty(Object object, Field field, Object value) {
         boolean access = field.isAccessible();
         field.setAccessible(true);
-        field.set(object, value);
+        try {
+            field.set(object, value);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException("Failed to set property to field " + field.getName());
+        }
         field.setAccessible(access);
     }
 }
