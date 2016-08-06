@@ -58,7 +58,7 @@ You can instantly build a request object filled with default values defined by `
 | Primitive Types | Its default value defined in JLS | `Type.valueOf(example)` |
 | Primitive Wrapper Types | Refers its primitive type's default value | `Type.valueOf(example)` |
 | `String` | "" | `example`|
-| `Enum`| `EnumType.values()[0]`| Does not affect |
+| `Enum`| `EnumType.values()[0]`| Value with same `name()` |
 | `List` or its derived type | `new ArrayList<>()` | Does not affect |
 | `Set` or its derived type | `new HashSet<>()` | Does not affect |
 | `Map` or its derived type | `new HashMap<>()` | Does not affect |

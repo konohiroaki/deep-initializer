@@ -14,6 +14,7 @@ class StringPopulator {
 
     static String populate(Field field) {
         ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
+
         if (property != null) {
             return property.example();
         } else {

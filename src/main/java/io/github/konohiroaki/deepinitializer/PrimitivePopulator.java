@@ -35,9 +35,10 @@ class PrimitivePopulator {
     }
 
     static Object populate(Field field) {
+        Class<?> clazz = field.getType();
         ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
+
         if (property != null && !property.example().equals("")) {
-            Class<?> clazz = field.getType();
             String example = property.example();
             if (clazz.equals(boolean.class) || clazz.equals(Boolean.class)) {
                 return Boolean.valueOf(example);
@@ -57,7 +58,7 @@ class PrimitivePopulator {
                 throw new IllegalArgumentException(clazz + " type not supported");
             }
         } else {
-            return populate(field.getType());
+            return populate(clazz);
         }
     }
 }

@@ -15,6 +15,7 @@ class ComplexObject extends SimpleObject {
     private double doubleA;
     @ApiModelProperty(example = "exampleString")
     private String stringA;
+    @ApiModelProperty(example = "EXECUTE")
     private AccessMode accessModeEnum;
     private List<Integer> integerList;
     private Set<ComplexObject2> accessModeSet;

@@ -34,7 +34,7 @@ public class DeepInitializer {
         } else if (TypeUtils.isString(clazz)) {
             return (T) StringPopulator.populate(field);
         } else if (clazz.isEnum()) {
-            return (T) clazz.getEnumConstants()[0];
+            return (T) EnumPopulator.populate(field);
         } else if (Collection.class.isAssignableFrom(clazz)) {
             return (T) CollectionPopulator.populate(clazz);
         } else if (Map.class.isAssignableFrom(clazz)) {
