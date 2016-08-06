@@ -35,23 +35,27 @@ public void test() {
 ```
 
 ## When do you want to use it?
-This might be helpful when you are testing your RESTful APIs. Creating requests for those APIs by manually writing Java code like this
+This might be helpful when you are testing your RESTful APIs.
+
+Creating requests for those APIs by manually writing Java code like this
 
 ```java
 SomeApiRequest rq = new SomeApiRequest();
 rq.setA(true);
 rq.setB(new B());
 rq.getB().setC(false);
-...more and more set
+...more and more sets
 ```
 
-for each APIs are so much waste of time. Rather than doing this, let's do this.
+is so much waste of time. Rather than doing this, let's do this.
 
 ```
 SomeApiRequest rq = DeepInitializer.initialize(SomeApiRequest.class);
 ```
 
-You can instantly build a request object filled with default values defined by `@io.swagger.annotations.ApiModelProperty#example(String)`.
+You can instantly build a request object filled with default values defined by `@ApiModelProperty#example(String)`.
+
+`@ApiModelProperty` is an annotation provided by Swagger project.
 
 ## Specification
 | Type | Value set when no annotation | Value set when `example` is set |
