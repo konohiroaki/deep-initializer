@@ -7,6 +7,18 @@
     <groupId>io.github.konohiroaki</groupId>
     <artifactId>deep-initializer</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Deep Initializer</name>
+    <description>Initialize deep bean recursively filling with default values.</description>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
