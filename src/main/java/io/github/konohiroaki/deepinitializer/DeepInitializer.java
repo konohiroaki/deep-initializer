@@ -4,9 +4,11 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public class DeepInitializer {
@@ -23,11 +25,19 @@ public class DeepInitializer {
         } else if (Map.class.isAssignableFrom(clazz)) {
             return (T) MapPopulator.populate();
         } else {
-            return populateField(clazz);
+            return populateFields(clazz);
         }
     }
 
-    private static <T> T populateField(Class<T> clazz) {
+    public static <T> List<T> initialize(Class<T> clazz, int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size needs to be positive number but was " + size);
+        }
+
+        return Stream.generate(() -> initialize(clazz)).limit(size).collect(Collectors.toList());
+    }
+
+    private static <T> T populateFields(Class<T> clazz) {
         T value;
         try {
             value = clazz.newInstance();
@@ -36,12 +46,12 @@ public class DeepInitializer {
         }
         Set<Field> fields = getAllFields(clazz);
         for (Field childField : fields) {
-            setProperty(value, childField, initField(childField));
+            setProperty(value, childField, populateField(childField));
         }
         return value;
     }
 
-    private static <T> T initField(Field field) {
+    private static <T> T populateField(Field field) {
         Class<?> clazz = field.getType();
         if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
             return (T) PrimitivePopulator.populate(field);
@@ -54,7 +64,7 @@ public class DeepInitializer {
         } else if (Map.class.isAssignableFrom(clazz)) {
             return (T) MapPopulator.populate();
         } else {
-            return (T) populateField(field.getType());
+            return (T) populateFields(clazz);
         }
     }
 

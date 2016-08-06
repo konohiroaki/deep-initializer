@@ -2,6 +2,8 @@ package io.github.konohiroaki.deepinitializer;
 
 import org.junit.Test;
 
+import java.util.List;
+
 public class DeepInitializerTest {
 
     @Test
@@ -22,5 +24,10 @@ public class DeepInitializerTest {
     @Test
     public void test4() throws Exception {
         String str = DeepInitializer.initialize(String.class);
+    }
+
+    @Test
+    public void test5() throws Exception {
+        List<String> str = DeepInitializer.initialize(String.class, 3);
     }
 }
