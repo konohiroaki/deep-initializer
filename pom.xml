@@ -6,11 +6,12 @@
 
     <groupId>io.github.konohiroaki</groupId>
     <artifactId>deep-initializer</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Deep Initializer</name>
     <description>Initialize deep bean recursively filling with default values.</description>
+    <url>https://github.com/konohiroaki/deep-initializer</url>
 
     <licenses>
         <license>
@@ -19,6 +20,20 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <id>konohiroaki</id>
+            <name>Hiroaki Kono</name>
+            <email>hiroakikono1990@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/konohiroaki/deep-initializer.git</connection>
+        <developerConnection>scm:git:ssh://github.com:konohiroaki/deep-initializer.git</developerConnection>
+        <url>http://github.com/konohiroaki/deep-initializer/tree/master</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,32 +52,7 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
-
     </build>
 
     <dependencies>
