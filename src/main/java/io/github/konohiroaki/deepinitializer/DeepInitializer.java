@@ -27,6 +27,20 @@ public class DeepInitializer {
         }
     }
 
+    private static <T> T populateField(Class<T> clazz) {
+        T value;
+        try {
+            value = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new IllegalArgumentException(clazz + " type not supported");
+        }
+        Set<Field> fields = getAllFields(clazz);
+        for (Field childField : fields) {
+            setProperty(value, childField, initField(childField));
+        }
+        return value;
+    }
+
     private static <T> T initField(Field field) {
         Class<?> clazz = field.getType();
         if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
@@ -42,20 +56,6 @@ public class DeepInitializer {
         } else {
             return (T) populateField(field.getType());
         }
-    }
-
-    private static <T> T populateField(Class<T> clazz) {
-        T value;
-        try {
-            value = clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalArgumentException(clazz + " type not supported");
-        }
-        Set<Field> fields = getAllFields(clazz);
-        for (Field childField : fields) {
-            setProperty(value, childField, initField(childField));
-        }
-        return value;
     }
 
     private static Set<Field> getAllFields(Class<?> clazz) {
