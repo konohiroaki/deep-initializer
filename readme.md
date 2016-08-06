@@ -53,13 +53,15 @@ SomeApiRequest rq = DeepInitializer.initialize(SomeApiRequest.class);
 You can instantly build a request object filled with default values defined by `@io.swagger.annotations.ApiModelProperty#example(String)`.
 
 ## Specification
-| Type | Value set when no annotation | Value when `example` is set |
+| Type | Value set when no annotation | Value set when `example` is set |
 |---|---|---|
 | Primitive Types | Its default value defined in JLS | `Type.valueOf(example)` |
 | Primitive Wrapper Types | Refers its primitive type's default value | `Type.valueOf(example)` |
 | `String` | "" | `example`|
 | `Enum`| `EnumType.values()[0]`| Does not affect |
-| `List` or (extends\|implements) `List` | `new ArrayList<>()` | Does not affect |
-| `Set` or (extends\|implements) `Set` | `new HashSet<>()` | Does not affect |
-| `Map` or (extends\|implements) `Map` | `new HashMap<>()` | Does not affect |
-| Others | `new OtherType()` and fills its fields following the same rule | Does not affect |
+| `List` or its derived type | `new ArrayList<>()` | Does not affect |
+| `Set` or its derived type | `new HashSet<>()` | Does not affect |
+| `Map` or its derived type | `new HashMap<>()` | Does not affect |
+| Others | `new OtherType()` and fills its fields with same rule | Does not affect |
+
+Many types are not supported yet. It will throw an `IllegalArgumentException` when it failed to build a bean.
