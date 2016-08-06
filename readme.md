@@ -1,4 +1,5 @@
 # Deep Initializer
+[![Build Status](https://travis-ci.org/konohiroaki/deep-initializer.svg?branch=master)](https://travis-ci.org/konohiroaki/deep-initializer)
 
 Initialize deep bean recursively filling with default values.
 
