@@ -43,17 +43,18 @@ Creating deep beans for those APIs by manually writing Java code like this
 SomeApiRequest rq = new SomeApiRequest();
 rq.setA(true);
 rq.setB(new B());
-rq.getB().setC(false);
+rq.getB().setC(10);
+rq.getB().setD("Hello");
 ...more and more sets
 ```
 
-is so much waste of time. Rather than doing this, let's do this.
+is so much waste of time. Rather than doing that, let's do this.
 
 ```java
 SomeApiRequest rq = new DeepInitializer().init(SomeApiRequest.class);
 ```
 
-You can instantly build a deep bean. The way how it initialize depends on the initializers you use. Yes, you can create your custom initializer for specific types!
+You can instantly build a deep bean. The way how it initializes depends on the initializers you use. Yes, you can create your custom initializer for specific types!
 
 By default, some types uses `@ApiModelProperty#example(String)` to specify a default value like above.
 
@@ -82,12 +83,14 @@ Default initializers are set when you `new DeepInitializer()`. You can remove de
 | Others | `new OtherType()` and fills its fields with the field default initializer |
 
 #### Field Initializer
-| Type | Value set when annotation absent | Value set when `example` is set |
+| Type | Value when annotation absent | Value when `example` is set |
 |---|---|---|
 | Primitive Types | Refers type initializer | `Type.valueOf(example)` |
 | Primitive Wrapper Types | Refers type initializer | `Type.valueOf(example)` |
 | `String` | Refers type initializer | `example`|
 | `Enum`| Refers type initializer| Value with same `name()` |
+
+(`example` comes from `@ApiModelProperty` annotation.)
 
 ### Custom initializer
 
@@ -118,3 +121,6 @@ public static void main(String[] args) {
     // You haven't added any custom type initializer for String.class thus it will use the default one.
 }
 ```
+
+## Contribute
+For any bug reports, enhancement requests, or code patches, please use the [GitHub Issue system](https://github.com/konohiroaki/deep-initializer/issues).
