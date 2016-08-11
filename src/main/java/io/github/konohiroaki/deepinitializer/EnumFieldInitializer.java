@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public class EnumFieldInitializer extends BaseFieldInitializer<Enum> {
+class EnumFieldInitializer extends BaseFieldInitializer<Enum> {
 
     @Override
     public Enum<?> init(Field field) {

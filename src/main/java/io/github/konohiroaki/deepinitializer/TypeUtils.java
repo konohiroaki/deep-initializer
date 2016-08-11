@@ -12,12 +12,4 @@ class TypeUtils {
                || clazz == Short.class || clazz == Character.class
                || clazz == Byte.class || clazz == Boolean.class;
     }
-
-    static boolean isString(Class<?> clazz) {
-        return clazz == String.class;
-    }
-
-    static boolean isEnum(Class<?> clazz) {
-        return clazz.isEnum();
-    }
 }

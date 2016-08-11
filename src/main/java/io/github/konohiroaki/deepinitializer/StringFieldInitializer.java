@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 
 import io.swagger.annotations.ApiModelProperty;
 
-public class StringFieldInitializer extends BaseFieldInitializer<String> {
+class StringFieldInitializer extends BaseFieldInitializer<String> {
 
     @Override
     public String init(Field field) {

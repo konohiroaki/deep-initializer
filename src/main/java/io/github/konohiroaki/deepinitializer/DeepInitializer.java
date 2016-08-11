@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import java.lang.reflect.Field;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,8 @@ public class DeepInitializer {
     private void addDefaultTypeInitializer() {
         addTypeInitializer(String.class, new StringTypeInitializer());
         addTypeInitializer(Enum.class, new EnumTypeInitializer());
-        addTypeInitializer(Collection.class, new CollectionTypeInitializer());
+        addTypeInitializer(List.class, new ListTypeInitializer());
+        addTypeInitializer(Set.class, new SetTypeInitializer());
         addTypeInitializer(Map.class, new MapTypeInitializer());
     }
 
@@ -111,7 +111,7 @@ public class DeepInitializer {
             }
         }
         if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) new PrimitiveInitializer().init(clazz);
+            return (T) new PrimitiveTypeInitializer().init(clazz);
         }
         return null;
     }
@@ -124,7 +124,7 @@ public class DeepInitializer {
             }
         }
         if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) new PrimitiveInitializer().init(field);
+            return (T) new PrimitiveFieldInitializer().init(field);
         }
         return getTypeValue(clazz);
     }
