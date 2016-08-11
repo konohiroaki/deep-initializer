@@ -14,7 +14,7 @@ class PrimitiveInitializer {
     private static float DEFAULT_FLOAT;
     private static double DEFAULT_DOUBLE;
 
-    Object populate(Class<?> clazz) {
+    Object init(Class<?> clazz) {
         if (clazz.equals(boolean.class) || clazz.equals(Boolean.class)) {
             return DEFAULT_BOOLEAN;
         } else if (clazz.equals(byte.class) || clazz.equals(Byte.class)) {
@@ -34,7 +34,7 @@ class PrimitiveInitializer {
         }
     }
 
-    Object populate(Field field) {
+    Object init(Field field) {
         Class<?> clazz = field.getType();
         ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
 
@@ -58,7 +58,7 @@ class PrimitiveInitializer {
                 throw new IllegalArgumentException(clazz + " type not supported");
             }
         } else {
-            return populate(clazz);
+            return init(clazz);
         }
     }
 }

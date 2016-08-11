@@ -49,20 +49,12 @@ public class DeepInitializer {
     }
 
     public <T> T init(Class<T> clazz) {
-        if (clazz.isEnum()) {
-            return (T) typeInitializerMap.get(Enum.class).init((Class) clazz);
-        }
-        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
-            if (entry.getKey().isAssignableFrom(clazz)) {
-                return (T) entry.getValue().init((Class) clazz);
-            }
+        T value = getTypeValue(clazz);
+        if (value != null) {
+            return value;
         }
 
-        if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) new PrimitiveInitializer().populate(clazz);
-        } else {
-            return initFields(clazz);
-        }
+        return initFields(clazz);
     }
 
     public <T> List<T> init(Class<T> clazz, int size) {
@@ -80,15 +72,40 @@ public class DeepInitializer {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(clazz + " type not supported");
         }
+
         Set<Field> fields = ReflectionUtils.getAllFields(clazz);
-        for (Field childField : fields) {
-            ReflectionUtils.setProperty(value, childField, initField(childField));
+        for (Field field : fields) {
+            ReflectionUtils.setProperty(value, field, initField(field));
         }
         return value;
     }
 
     private <T> T initField(Field field) {
-        Class<?> clazz = field.getType();
+        T value = getFieldValue((field));
+        if (value != null) {
+            return value;
+        }
+
+        return initFields((Class<T>) field.getType());
+    }
+
+    private <T> T getTypeValue(Class<T> clazz) {
+        if (clazz.isEnum()) {
+            return (T) typeInitializerMap.get(Enum.class).init((Class) clazz);
+        }
+        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
+            if (entry.getKey().isAssignableFrom(clazz)) {
+                return (T) entry.getValue().init((Class) clazz);
+            }
+        }
+        if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
+            return (T) new PrimitiveInitializer().init(clazz);
+        }
+        return null;
+    }
+
+    private <T> T getFieldValue(Field field) {
+        Class<T> clazz = (Class<T>) field.getType();
         if (clazz.isEnum()) {
             return (T) fieldInitializerMap.get(Enum.class).init(field);
         }
@@ -97,16 +114,9 @@ public class DeepInitializer {
                 return (T) entry.getValue().init(field);
             }
         }
-        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
-            if (entry.getKey().isAssignableFrom(clazz)) {
-                return (T) entry.getValue().init((Class) clazz);
-            }
+        if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
+            return (T) new PrimitiveInitializer().init(field);
         }
-
-        if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) new PrimitiveInitializer().populate(field);
-        } else {
-            return (T) initFields(clazz);
-        }
+        return getTypeValue(clazz);
     }
 }

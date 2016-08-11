@@ -42,13 +42,13 @@ public class DeepInitializerTest {
     }
 
     @Test
-    public void test6() {
+    public void testEnumWithDefault() {
         AccessMode mode = new DeepInitializer().init(AccessMode.class);
         assertThat(mode, is(AccessMode.READ));
     }
 
     @Test
-    public void test7() {
+    public void testEnumWithCustom() {
         DeepInitializer deep = new DeepInitializer();
         deep.addTypeInitializer(Enum.class, new CustomEnumInit());
         AccessMode mode = deep.init(AccessMode.class);
