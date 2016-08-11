@@ -40,16 +40,13 @@ public class DeepInitializer {
     }
 
     public void removeTypeInitializer(Class<?> type) {
-        Map.Entry<Class<?>, BaseTypeInitializer<?>> target = null;
+        List<Map.Entry<Class<?>, BaseTypeInitializer<?>>> target = new ArrayList<>();
         for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializer) {
             if (entry.getKey() == type) {
-                target = entry;
-                break;
+                target.add(entry);
             }
         }
-        if (target != null) {
-            typeInitializer.remove(target);
-        }
+        typeInitializer.removeAll(target);
     }
 
     public <T> void addFieldInitializer(Class<? extends T> type, BaseFieldInitializer<T> init) {
@@ -57,16 +54,13 @@ public class DeepInitializer {
     }
 
     public void removeFieldInitializer(Class<?> type) {
-        Map.Entry<Class<?>, BaseFieldInitializer<?>> target = null;
+        List<Map.Entry<Class<?>, BaseFieldInitializer<?>>> target = new ArrayList<>();
         for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : fieldInitializer) {
             if (entry.getKey() == type) {
-                target = entry;
-                break;
+                target.add(entry);
             }
         }
-        if (target != null) {
-            fieldInitializer.remove(target);
-        }
+        fieldInitializer.removeAll(target);
     }
 
     public <T> T init(Class<T> clazz) {

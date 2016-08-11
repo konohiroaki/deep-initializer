@@ -112,8 +112,9 @@ public static void main(String[] args) {
 
     deep.removeFieldInitializer(String.class);
     System.out.println(deep.init(C.class).str); // ==> ""
-    // Field initializer for String.class is removed but there is no custom field initializer for String.class added.
+    // Field initializer for String.class is removed
+    // and there is no custom field initializer for String.class set after that.
     // In this case, it fallbacks to type initializer.
-    // We haven't added any custom type initializer for String.class thus it will use the default one.
+    // You haven't added any custom type initializer for String.class thus it will use the default one.
 }
 ```
