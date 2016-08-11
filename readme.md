@@ -49,7 +49,7 @@ rq.getB().setC(false);
 
 is so much waste of time. Rather than doing this, let's do this.
 
-```
+```java
 SomeApiRequest rq = new DeepInitializer().init(SomeApiRequest.class);
 ```
 
@@ -93,7 +93,7 @@ Default initializers are set when you `new DeepInitializer()`. You can remove de
 
 You can add your custom initializers. To do so, extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>`.
 
-```
+```java
 class C {
     @ApiModelProperty(example = "Hello World!")
     String str;
