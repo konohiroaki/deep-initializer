@@ -64,7 +64,7 @@ By default, some types uses `@ApiModelProperty#example(String)` to specify a def
 
 There are two kinds of initalizers, "type initializer" and "field initializer". Type initializer only refers its type information to decide its value. Field initializer refers the field information thus you can get some more information than type initializer. So these two are not that different, and if there's no field initializer for a type, it fallbacks to its type initializer.
 
-The parameter you pass to `DeepInitializer#init(Class)` is just a type thus it cannot refer any field information. But the fields defined in that type can refer its field information.
+The parameter you pass to `DeepInitializer#init(Class)` is just a type thus it cannot refer any field information. But the fields declared in that type can refer its field information.
 
 ### Default initializer
 
@@ -94,7 +94,7 @@ Default initializers are set when you `new DeepInitializer()`. You can remove de
 
 ### Custom initializer
 
-You can add your custom initializers. To do so, extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>`.
+The initialization behaviour is fully customizable. You can add your custom initializers to change the behaviour of each initialization. To do so, extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>`.
 
 ```java
 class C {
@@ -111,14 +111,14 @@ public static void main(String[] args) {
 
     deep.addTypeInitializer(Integer.class, new CustomIntegerInit());
     System.out.println(deep.init(Integer.class)); // ==> 10
-    // Added initializer takes priority than the default. (Specifically, later added has higher priority)
+    // Custom initializer takes priority than the default. (Specifically, later added has higher priority)
 
     deep.removeFieldInitializer(String.class);
     System.out.println(deep.init(C.class).str); // ==> ""
     // Field initializer for String.class is removed
-    // and there is no custom field initializer for String.class set after that.
+    // and there's no custom field initializer for String.class set after that.
     // In this case, it fallbacks to type initializer.
-    // You haven't added any custom type initializer for String.class thus it will use the default one.
+    // You haven't added any custom type initializer for String.class thus it'll use the default one.
 }
 ```
 
