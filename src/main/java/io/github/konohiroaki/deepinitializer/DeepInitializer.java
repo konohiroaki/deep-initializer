@@ -106,7 +106,7 @@ public class DeepInitializer {
 
     private <T> T getFieldValue(Field field) {
         Class<T> clazz = (Class<T>) field.getType();
-        if (clazz.isEnum()) {
+        if (clazz.isEnum() && fieldInitializerMap.get(Enum.class) != null) {
             return (T) fieldInitializerMap.get(Enum.class).init(field);
         }
         for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : fieldInitializerMap.entrySet()) {

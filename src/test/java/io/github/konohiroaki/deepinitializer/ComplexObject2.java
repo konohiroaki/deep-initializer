@@ -1,9 +1,8 @@
 package io.github.konohiroaki.deepinitializer;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.nio.file.AccessMode;
 
 class ComplexObject2 {
 
-    @ApiModelProperty(example = "3")
-    private int intA2;
+    public AccessMode accessMode;
 }
