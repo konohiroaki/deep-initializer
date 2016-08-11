@@ -1,8 +1,11 @@
 package io.github.konohiroaki.deepinitializer;
 
+import com.google.common.collect.Lists;
+
 import java.lang.reflect.Field;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,8 +15,8 @@ import java.util.stream.Stream;
 @SuppressWarnings("unchecked")
 public class DeepInitializer {
 
-    private final Map<Class<?>, BaseTypeInitializer<?>> typeInitializerMap = new HashMap<>();
-    private final Map<Class<?>, BaseFieldInitializer<?>> fieldInitializerMap = new HashMap<>();
+    private final List<Map.Entry<Class<?>, BaseTypeInitializer<?>>> typeInitializer = new ArrayList<>();
+    private final List<Map.Entry<Class<?>, BaseFieldInitializer<?>>> fieldInitializer = new ArrayList<>();
 
     public DeepInitializer() {
         addDefaultTypeInitializer();
@@ -33,19 +36,37 @@ public class DeepInitializer {
     }
 
     public <T> void addTypeInitializer(Class<? extends T> type, BaseTypeInitializer<T> init) {
-        typeInitializerMap.put(type, init);
+        typeInitializer.add(new AbstractMap.SimpleImmutableEntry<>(type, init));
     }
 
     public void removeTypeInitializer(Class<?> type) {
-        typeInitializerMap.remove(type);
+        Map.Entry<Class<?>, BaseTypeInitializer<?>> target = null;
+        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializer) {
+            if (entry.getKey() == type) {
+                target = entry;
+                break;
+            }
+        }
+        if (target != null) {
+            typeInitializer.remove(target);
+        }
     }
 
     public <T> void addFieldInitializer(Class<? extends T> type, BaseFieldInitializer<T> init) {
-        fieldInitializerMap.put(type, init);
+        fieldInitializer.add(new AbstractMap.SimpleImmutableEntry<>(type, init));
     }
 
     public void removeFieldInitializer(Class<?> type) {
-        fieldInitializerMap.remove(type);
+        Map.Entry<Class<?>, BaseFieldInitializer<?>> target = null;
+        for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : fieldInitializer) {
+            if (entry.getKey() == type) {
+                target = entry;
+                break;
+            }
+        }
+        if (target != null) {
+            fieldInitializer.remove(target);
+        }
     }
 
     public <T> T init(Class<T> clazz) {
@@ -90,7 +111,7 @@ public class DeepInitializer {
     }
 
     private <T> T getTypeValue(Class<T> clazz) {
-        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
+        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : Lists.reverse(typeInitializer)) {
             if (entry.getKey().isAssignableFrom(clazz)) {
                 return (T) entry.getValue().init((Class) clazz);
             }
@@ -103,7 +124,7 @@ public class DeepInitializer {
 
     private <T> T getFieldValue(Field field) {
         Class<T> clazz = (Class<T>) field.getType();
-        for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : fieldInitializerMap.entrySet()) {
+        for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : Lists.reverse(fieldInitializer)) {
             if (entry.getKey().isAssignableFrom(clazz)) {
                 return (T) entry.getValue().init(field);
             }

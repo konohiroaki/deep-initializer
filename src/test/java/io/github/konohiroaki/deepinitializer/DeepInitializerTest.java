@@ -64,10 +64,25 @@ public class DeepInitializerTest {
         assertThat(obj.accessMode, is(AccessMode.READ));
     }
 
+    @Test
+    public void testSpecificEnumCustomInitializer() {
+        DeepInitializer deep = new DeepInitializer();
+        deep.addTypeInitializer(AccessMode.class, new CustomAccessModeInit());
+        AccessMode mode = deep.init(AccessMode.class);
+        assertThat(mode, is(AccessMode.EXECUTE));
+    }
+
     private class CustomEnumInit extends BaseTypeInitializer<Enum> {
 
         @Override public Enum<?> init(Class<Enum> clazz) {
             return clazz.getEnumConstants()[1];
+        }
+    }
+
+    private class CustomAccessModeInit extends BaseTypeInitializer<AccessMode> {
+
+        @Override public AccessMode init(Class<AccessMode> clazz) {
+            return AccessMode.EXECUTE;
         }
     }
 }
