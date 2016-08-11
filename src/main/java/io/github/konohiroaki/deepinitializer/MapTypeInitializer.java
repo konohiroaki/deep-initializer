@@ -3,9 +3,10 @@ package io.github.konohiroaki.deepinitializer;
 import java.util.HashMap;
 import java.util.Map;
 
-class MapPopulator {
+class MapTypeInitializer extends BaseTypeInitializer<Map> {
 
-    static Map<?, ?> populate() {
+    @Override
+    public Map<?, ?> init(Class<Map> clazz) {
         return new HashMap<>();
     }
 }

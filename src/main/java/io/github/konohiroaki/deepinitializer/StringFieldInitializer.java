@@ -4,21 +4,16 @@ import java.lang.reflect.Field;
 
 import io.swagger.annotations.ApiModelProperty;
 
-class StringPopulator {
+public class StringFieldInitializer extends BaseFieldInitializer<String> {
 
-    private static final String EMPTY = "";
-
-    static String populate() {
-        return EMPTY;
-    }
-
-    static String populate(Field field) {
+    @Override
+    public String init(Field field) {
         ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
 
         if (property != null) {
             return property.example();
         } else {
-            return populate();
+            return new StringTypeInitializer().init(String.class);
         }
     }
 }

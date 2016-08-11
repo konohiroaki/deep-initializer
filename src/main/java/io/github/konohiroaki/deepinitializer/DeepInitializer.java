@@ -1,9 +1,8 @@
 package io.github.konohiroaki.deepinitializer;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,80 +12,101 @@ import java.util.stream.Stream;
 @SuppressWarnings("unchecked")
 public class DeepInitializer {
 
-    public static <T> T initialize(Class<T> clazz) {
-        if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) PrimitivePopulator.populate(clazz);
-        } else if (TypeUtils.isString(clazz)) {
-            return (T) StringPopulator.populate();
-        } else if (clazz.isEnum()) {
-            return (T) EnumPopulator.populate(clazz);
-        } else if (Collection.class.isAssignableFrom(clazz)) {
-            return (T) CollectionPopulator.populate(clazz);
-        } else if (Map.class.isAssignableFrom(clazz)) {
-            return (T) MapPopulator.populate();
+    private final Map<Class<?>, BaseTypeInitializer<?>> typeInitializerMap = new HashMap<>();
+    private final Map<Class<?>, BaseFieldInitializer<?>> fieldInitializerMap = new HashMap<>();
+
+    public DeepInitializer() {
+        addDefaultTypeInitializer();
+        addDefaultFieldInitializer();
+    }
+
+    private void addDefaultTypeInitializer() {
+        addTypeInitializer(String.class, new StringTypeInitializer());
+        addTypeInitializer(Enum.class, new EnumTypeInitializer());
+        addTypeInitializer(Collection.class, new CollectionTypeInitializer());
+        addTypeInitializer(Map.class, new MapTypeInitializer());
+    }
+
+    private void addDefaultFieldInitializer() {
+        addFieldInitializer(String.class, new StringFieldInitializer());
+        addFieldInitializer(Enum.class, new EnumFieldInitializer());
+    }
+
+    public <T> void addTypeInitializer(Class<? extends T> type, BaseTypeInitializer<T> init) {
+        typeInitializerMap.put(type, init);
+    }
+
+    public void removeTypeInitializer(Class<?> type) {
+        typeInitializerMap.remove(type);
+    }
+
+    public <T> void addFieldInitializer(Class<? extends T> type, BaseFieldInitializer<T> init) {
+        fieldInitializerMap.put(type, init);
+    }
+
+    public void removeFieldInitializer(Class<?> type) {
+        fieldInitializerMap.remove(type);
+    }
+
+    public <T> T init(Class<T> clazz) {
+        if (clazz.isEnum()) {
+            return (T) typeInitializerMap.get(Enum.class).init((Class) clazz);
+        }
+        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
+            if (entry.getKey().isAssignableFrom(clazz)) {
+                return (T) entry.getValue().init((Class) clazz);
+            }
+        }
+
+        if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
+            return (T) new PrimitiveInitializer().populate(clazz);
         } else {
-            return populateFields(clazz);
+            return initFields(clazz);
         }
     }
 
-    public static <T> List<T> initialize(Class<T> clazz, int size) {
+    public <T> List<T> init(Class<T> clazz, int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("size needs to be positive number but was " + size);
         }
 
-        return Stream.generate(() -> initialize(clazz)).limit(size).collect(Collectors.toList());
+        return Stream.generate(() -> init(clazz)).limit(size).collect(Collectors.toList());
     }
 
-    private static <T> T populateFields(Class<T> clazz) {
+    private <T> T initFields(Class<T> clazz) {
         T value;
         try {
             value = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(clazz + " type not supported");
         }
-        Set<Field> fields = getAllFields(clazz);
+        Set<Field> fields = ReflectionUtils.getAllFields(clazz);
         for (Field childField : fields) {
-            setProperty(value, childField, populateField(childField));
+            ReflectionUtils.setProperty(value, childField, initField(childField));
         }
         return value;
     }
 
-    private static <T> T populateField(Field field) {
+    private <T> T initField(Field field) {
         Class<?> clazz = field.getType();
+        if (clazz.isEnum()) {
+            return (T) fieldInitializerMap.get(Enum.class).init(field);
+        }
+        for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : fieldInitializerMap.entrySet()) {
+            if (entry.getKey().isAssignableFrom(clazz)) {
+                return (T) entry.getValue().init(field);
+            }
+        }
+        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
+            if (entry.getKey().isAssignableFrom(clazz)) {
+                return (T) entry.getValue().init((Class) clazz);
+            }
+        }
+
         if (clazz.isPrimitive() || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) PrimitivePopulator.populate(field);
-        } else if (TypeUtils.isString(clazz)) {
-            return (T) StringPopulator.populate(field);
-        } else if (clazz.isEnum()) {
-            return (T) EnumPopulator.populate(field);
-        } else if (Collection.class.isAssignableFrom(clazz)) {
-            return (T) CollectionPopulator.populate(clazz);
-        } else if (Map.class.isAssignableFrom(clazz)) {
-            return (T) MapPopulator.populate();
+            return (T) new PrimitiveInitializer().populate(field);
         } else {
-            return (T) populateFields(clazz);
+            return (T) initFields(clazz);
         }
-    }
-
-    private static Set<Field> getAllFields(Class<?> clazz) {
-        Set<Field> fields = new HashSet<>(Arrays.asList(clazz.getDeclaredFields()));
-        if (clazz.getSuperclass() != null) {
-            fields.addAll(getAllFields(clazz.getSuperclass()));
-        }
-
-        return fields.stream()
-            .filter(field -> !field.isSynthetic())
-            .collect(Collectors.toSet());
-    }
-
-    private static void setProperty(Object object, Field field, Object value) {
-        boolean access = field.isAccessible();
-        field.setAccessible(true);
-        try {
-            field.set(object, value);
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException("Failed to set property to field " + field.getName());
-        }
-        field.setAccessible(access);
     }
 }

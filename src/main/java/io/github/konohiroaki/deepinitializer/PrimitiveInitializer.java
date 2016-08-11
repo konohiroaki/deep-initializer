@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 
 import io.swagger.annotations.ApiModelProperty;
 
-class PrimitivePopulator {
+class PrimitiveInitializer {
 
     private static boolean DEFAULT_BOOLEAN;
     private static byte DEFAULT_BYTE;
@@ -14,7 +14,7 @@ class PrimitivePopulator {
     private static float DEFAULT_FLOAT;
     private static double DEFAULT_DOUBLE;
 
-    static Object populate(Class<?> clazz) {
+    Object populate(Class<?> clazz) {
         if (clazz.equals(boolean.class) || clazz.equals(Boolean.class)) {
             return DEFAULT_BOOLEAN;
         } else if (clazz.equals(byte.class) || clazz.equals(Byte.class)) {
@@ -34,7 +34,7 @@ class PrimitivePopulator {
         }
     }
 
-    static Object populate(Field field) {
+    Object populate(Field field) {
         Class<?> clazz = field.getType();
         ApiModelProperty property = field.getAnnotation(ApiModelProperty.class);
 

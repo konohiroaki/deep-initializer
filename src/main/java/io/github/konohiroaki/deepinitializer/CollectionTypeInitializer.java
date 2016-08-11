@@ -6,9 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class CollectionPopulator {
+class CollectionTypeInitializer extends BaseTypeInitializer<Collection> {
 
-    static Collection<?> populate(Class<?> clazz) {
+    @Override
+    public Collection<?> init(Class<Collection> clazz) {
         if (clazz.isAssignableFrom(List.class)) {
             return new ArrayList<>();
         } else if (clazz.isAssignableFrom(Set.class)) {
