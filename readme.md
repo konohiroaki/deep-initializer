@@ -1,7 +1,7 @@
 # Deep Initializer
-[![Build Status](https://travis-ci.org/konohiroaki/deep-initializer.svg?branch=master)](https://travis-ci.org/konohiroaki/deep-initializer)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.konohiroaki/deep-initializer/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.konohiroaki/deep-initializer)
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://opensource.org/licenses/mit-license.php)
+## [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.konohiroaki/deep-initializer/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.konohiroaki/deep-initializer) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://opensource.org/licenses/mit-license.php)
+
+## [![Build Status](https://travis-ci.org/konohiroaki/deep-initializer.svg?branch=master)](https://travis-ci.org/konohiroaki/deep-initializer) [![Coverage Status](https://coveralls.io/repos/github/konohiroaki/deep-initializer/badge.svg)](https://coveralls.io/github/konohiroaki/deep-initializer)
 
 Initialize deep bean recursively filling with default values.
 
