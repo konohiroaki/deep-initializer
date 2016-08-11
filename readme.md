@@ -27,7 +27,7 @@ class C {
 ======= SomeTest.java
 @Test
 public void test() {
-    B b = DeepInitializer.initialize(B.class);
+    B b = new DeepInitializer().init(B.class);
 
     assertThat(b.num, is(0));
     assertThat(b.bool, is(true));
@@ -52,23 +52,66 @@ rq.getB().setC(false);
 is so much waste of time. Rather than doing this, let's do this.
 
 ```
-SomeApiRequest rq = DeepInitializer.initialize(SomeApiRequest.class);
+SomeApiRequest rq = new DeepInitializer().init(SomeApiRequest.class);
 ```
 
-You can instantly build a request object filled with default values defined by `@ApiModelProperty#example(String)`.
+You can instantly build a deep bean filled with default values defined by `@ApiModelProperty#example(String)`.
 
 `@ApiModelProperty` is an annotation provided by Swagger project.
 
 ## Specification
-| Type | Value set when no annotation | Value set when `example` is set |
-|---|---|---|
-| Primitive Types | Its default value defined in JLS | `Type.valueOf(example)` |
-| Primitive Wrapper Types | Refers its primitive type's default value | `Type.valueOf(example)` |
-| `String` | `""` | `example`|
-| `Enum`| `EnumType.values()[0]`| Value with same `name()` |
-| `List` or its derived type | `new ArrayList<>()` | Does not affect |
-| `Set` or its derived type | `new HashSet<>()` | Does not affect |
-| `Map` or its derived type | `new HashMap<>()` | Does not affect |
-| Others | `new OtherType()` and fills its fields with same rule | Does not affect |
 
-Many types are not supported yet. It will throw an `IllegalArgumentException` when it failed to build a bean.
+### Default initializer
+
+#### Type Initializer
+| Type | Value |
+|---|---|
+| Primitive Types | Its default value defined in JLS |
+| Primitive Wrapper Types | Refers its primitive type's default value |
+| `String` | `""` |
+| `Enum`| `EnumType.values()[0]`|
+| `List` or its derived type | `new ArrayList<>()` |
+| `Set` or its derived type | `new HashSet<>()` |
+| `Map` or its derived type | `new HashMap<>()` |
+| Others | `new OtherType()` and fills its fields with the field default initializer |
+
+#### Field Initializer
+| Type | Value set when annotation absent | Value set when `example` is set |
+|---|---|---|
+| Primitive Types | Refers type initializer | `Type.valueOf(example)` |
+| Primitive Wrapper Types | Refers type initializer | `Type.valueOf(example)` |
+| `String` | Refers type initializer | `example`|
+| `Enum`| Refers type initializer| Value with same `name()` |
+
+It fallbacks to type initializer when there is no field initializer.
+
+### Custom initializer
+You can add/remove your custom initializer by implementing it.
+
+Extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>` for your custom initializer.
+
+```
+class C {
+    @ApiModelProperty(example = "Hello World!")
+    String str;
+}
+
+class CustomIntegerInit extends BaseTypeInitializer<Integer> {
+    @Override public Integer init(Class<Integer> clazz) { return 10; }
+}
+
+public static void main(String[] args) {
+    DeepInitializer deep = new DeepInitializer();
+    deep.addTypeInitializer(Integer.class, new CustomIntegerInit());
+    Integer num = deep.init(Integer.class);
+    // ==> 10
+    // Added initializer takes priority than the default. (Specifically, later added has higher priority)
+
+    deep.removeFieldInitializer(String.class);
+    C str = deep.init(C.class);
+    // ==> ""
+    // Field initializer for String.class is removed but there is no custom field initializer for String.class added.
+    // In this case, it fallbacks to type initializer.
+    // We haven't added any custom type initializer for String.class thus it will use the default one.
+}
+```

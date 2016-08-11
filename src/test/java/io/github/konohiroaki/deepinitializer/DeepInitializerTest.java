@@ -67,9 +67,9 @@ public class DeepInitializerTest {
     @Test
     public void testSpecificEnumCustomInitializer() {
         DeepInitializer deep = new DeepInitializer();
-        deep.addTypeInitializer(AccessMode.class, new CustomAccessModeInit());
-        AccessMode mode = deep.init(AccessMode.class);
-        assertThat(mode, is(AccessMode.EXECUTE));
+        deep.addTypeInitializer(Integer.class, new CustomIntegerInit());
+        Integer mode = deep.init(Integer.class);
+        assertThat(mode, is(10));
     }
 
     private class CustomEnumInit extends BaseTypeInitializer<Enum> {
@@ -79,10 +79,10 @@ public class DeepInitializerTest {
         }
     }
 
-    private class CustomAccessModeInit extends BaseTypeInitializer<AccessMode> {
+    private class CustomIntegerInit extends BaseTypeInitializer<Integer> {
 
-        @Override public AccessMode init(Class<AccessMode> clazz) {
-            return AccessMode.EXECUTE;
+        @Override public Integer init(Class<Integer> clazz) {
+            return 10;
         }
     }
 }
