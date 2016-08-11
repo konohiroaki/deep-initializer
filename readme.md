@@ -3,7 +3,7 @@
 
 ## [![Build Status](https://travis-ci.org/konohiroaki/deep-initializer.svg?branch=master)](https://travis-ci.org/konohiroaki/deep-initializer) [![Coverage Status](https://coveralls.io/repos/github/konohiroaki/deep-initializer/badge.svg)](https://coveralls.io/github/konohiroaki/deep-initializer)
 
-Initialize deep bean recursively filling with default values.
+Initialize deep bean recursively with customizable initializers.
 
 ```java
 ======= A.java
@@ -24,22 +24,20 @@ class C {
     String str;
 }
 
-======= SomeTest.java
-@Test
-public void test() {
+======= Main.java
+public static void main(String[] args) {
     B b = new DeepInitializer().init(B.class);
 
-    assertThat(b.num, is(0));
-    assertThat(b.bool, is(true));
-    assertThat(b.c, is(not(nullValue())));
-    assertThat(b.c.str, is("Hello World!"));
+    System.out.println(b.num); // ==> 0
+    System.out.println(b.bool); // ==> true
+    System.out.println(b.c.str); // ==> "Hello World!"
 }
 ```
 
 ## When do you want to use it?
-This might be helpful when you are testing your RESTful APIs.
+This might be helpful when you want to test an API which requires deep bean for calling it.
 
-Creating requests for those APIs by manually writing Java code like this
+Creating deep beans for those APIs by manually writing Java code like this
 
 ```java
 SomeApiRequest rq = new SomeApiRequest();
@@ -55,13 +53,21 @@ is so much waste of time. Rather than doing this, let's do this.
 SomeApiRequest rq = new DeepInitializer().init(SomeApiRequest.class);
 ```
 
-You can instantly build a deep bean filled with default values defined by `@ApiModelProperty#example(String)`.
+You can instantly build a deep bean. The way how it initialize depends on the initializers you use. Yes, you can create your custom initializer for specific types!
+
+By default, some types uses `@ApiModelProperty#example(String)` to specify a default value like above.
 
 `@ApiModelProperty` is an annotation provided by Swagger project.
 
 ## Specification
 
+There are two kinds of initalizers, "type initializer" and "field initializer". Type initializer only refers its type information to decide its value. Field initializer refers the field information thus you can get some more information than type initializer. So these two are not that different, and if there's no field initializer for a type, it fallbacks to its type initializer.
+
+The parameter you pass to `DeepInitializer#init(Class)` is just a type thus it cannot refer any field information. But the fields defined in that type can refer its field information.
+
 ### Default initializer
+
+Default initializers are set when you `new DeepInitializer()`. You can remove default initializers if you don't want to use it.
 
 #### Type Initializer
 | Type | Value |
@@ -83,12 +89,9 @@ You can instantly build a deep bean filled with default values defined by `@ApiM
 | `String` | Refers type initializer | `example`|
 | `Enum`| Refers type initializer| Value with same `name()` |
 
-It fallbacks to type initializer when there is no field initializer.
-
 ### Custom initializer
-You can add/remove your custom initializer by implementing it.
 
-Extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>` for your custom initializer.
+You can add your custom initializers. To do so, extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>`.
 
 ```
 class C {
@@ -102,14 +105,13 @@ class CustomIntegerInit extends BaseTypeInitializer<Integer> {
 
 public static void main(String[] args) {
     DeepInitializer deep = new DeepInitializer();
+
     deep.addTypeInitializer(Integer.class, new CustomIntegerInit());
-    Integer num = deep.init(Integer.class);
-    // ==> 10
+    System.out.println(deep.init(Integer.class)); // ==> 10
     // Added initializer takes priority than the default. (Specifically, later added has higher priority)
 
     deep.removeFieldInitializer(String.class);
-    C str = deep.init(C.class);
-    // ==> ""
+    System.out.println(deep.init(C.class).str); // ==> ""
     // Field initializer for String.class is removed but there is no custom field initializer for String.class added.
     // In this case, it fallbacks to type initializer.
     // We haven't added any custom type initializer for String.class thus it will use the default one.
