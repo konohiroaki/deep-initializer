@@ -90,7 +90,7 @@ public class DeepInitializer {
     }
 
     private <T> T getTypeValue(Class<T> clazz) {
-        if (clazz.isEnum()) {
+        if (clazz.isEnum() && typeInitializerMap.get(Enum.class) != null) {
             return (T) typeInitializerMap.get(Enum.class).init((Class) clazz);
         }
         for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializerMap.entrySet()) {
