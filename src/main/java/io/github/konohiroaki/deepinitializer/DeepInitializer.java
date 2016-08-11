@@ -1,7 +1,5 @@
 package io.github.konohiroaki.deepinitializer;
 
-import com.google.common.collect.Lists;
-
 import java.lang.reflect.Field;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -105,7 +103,7 @@ public class DeepInitializer {
     }
 
     private <T> T getTypeValue(Class<T> clazz) {
-        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : Lists.reverse(typeInitializer)) {
+        for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : ListUtils.reverse(typeInitializer)) {
             if (entry.getKey().isAssignableFrom(clazz)) {
                 return (T) entry.getValue().init((Class) clazz);
             }
@@ -118,7 +116,7 @@ public class DeepInitializer {
 
     private <T> T getFieldValue(Field field) {
         Class<T> clazz = (Class<T>) field.getType();
-        for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : Lists.reverse(fieldInitializer)) {
+        for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : ListUtils.reverse(fieldInitializer)) {
             if (entry.getKey().isAssignableFrom(clazz)) {
                 return (T) entry.getValue().init(field);
             }
