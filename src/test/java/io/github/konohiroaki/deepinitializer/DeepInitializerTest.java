@@ -62,8 +62,6 @@ public class DeepInitializerTest {
         deep.removeFieldInitializer(Enum.class);
         ComplexObject2 obj = deep.init(ComplexObject2.class);
         assertThat(obj.accessMode, is(AccessMode.READ));
-
-
     }
 
     private class CustomEnumInit extends BaseTypeInitializer<Enum> {
