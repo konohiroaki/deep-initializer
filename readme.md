@@ -13,14 +13,12 @@ class A {
 
 ======= B.java
 class B extends A {
-    @ApiModelProperty(example = "true")
     boolean bool;
     C c;
 }
 
 ======= C.java
 class C {
-    @ApiModelProperty(example = "Hello World!")
     String str;
 }
 
@@ -29,8 +27,8 @@ public static void main(String[] args) {
     B b = new DeepInitializer().init(B.class);
 
     System.out.println(b.num); // ==> 0
-    System.out.println(b.bool); // ==> true
-    System.out.println(b.c.str); // ==> "Hello World!"
+    System.out.println(b.bool); // ==> false
+    System.out.println(b.c.str); // ==> ""
 }
 ```
 
@@ -54,11 +52,7 @@ is so much waste of time. Rather than doing that, let's do this.
 SomeApiRequest rq = new DeepInitializer().init(SomeApiRequest.class);
 ```
 
-You can instantly build a deep bean. The way how it initializes depends on the initializers you use. Yes, you can create your custom initializer for specific types!
-
-By default, some types uses `@ApiModelProperty#example(String)` to specify a default value like above.
-
-`@ApiModelProperty` is an annotation provided by Swagger project.
+You can instantly build a deep bean. The way how it initializes a bean depends on the initializers you use. Yes, you can create your custom initializer for specific types!
 
 ## Specification
 
@@ -83,42 +77,61 @@ Default initializers are set when you `new DeepInitializer()`. You can remove de
 | Others | `new OtherType()` and fills its fields with the field default initializer |
 
 #### Field Initializer
-| Type | Value when annotation absent | Value when `example` is set |
-|---|---|---|
-| Primitive Types | Refers type initializer | `Type.valueOf(example)` |
-| Primitive Wrapper Types | Refers type initializer | `Type.valueOf(example)` |
-| `String` | Refers type initializer | `example`|
-| `Enum`| Refers type initializer| Value with same `name()` |
 
-(`example` comes from `@ApiModelProperty` annotation.)
+There is no default field initializers. It only refers type information by default.
 
 ### Custom initializer
 
 The initialization behaviour is fully customizable. You can add your custom initializers to change the behaviour of each initialization. To do so, extend `BaseTypeInitializer<>` or `BaseFieldInitializer<>`.
 
 ```java
-class C {
-    @ApiModelProperty(example = "Hello World!")
-    String str;
+class ExamplePojo {
+    @CustomAnnotation("Hello World!")
+    String str1;
+    String str2;
 }
 
-class CustomIntegerInit extends BaseTypeInitializer<Integer> {
-    @Override public Integer init(Class<Integer> clazz) { return 10; }
+@Retention(RetentionPolicy.RUNTIME)
+@interface CustomAnnotation {
+    String value();
 }
 
-public static void main(String[] args) {
+class CustomStringTypeInitializer extends BaseTypeInitializer<String> {
+    @Override public String init(Class<String> clazz) {
+        return "DEFAULT";
+    }
+}
+
+class CustomStringFieldInitializer extends BaseFieldInitializer<String> {
+    @Override public String init(Field field) {
+        CustomAnnotation annotation = field.getAnnotation(CustomAnnotation.class);
+        if (annotation != null && annotation.value() != null) {
+            return annotation.value();
+        }
+        return new CustomStringTypeInitializer().init(String.class);
+    }
+}
+
+@Test
+public void test() {
     DeepInitializer deep = new DeepInitializer();
 
-    deep.addTypeInitializer(Integer.class, new CustomIntegerInit());
-    System.out.println(deep.init(Integer.class)); // ==> 10
+    deep.addTypeInitializer(String.class, new CustomStringTypeInitializer());
+    System.out.println(deep.init(String.class));           // ==> "DEFAULT"
     // Custom initializer takes priority than the default. (Specifically, later added has higher priority)
 
+    deep.addFieldInitializer(String.class, new CustomStringFieldInitializer());
+    System.out.println(deep.init(ExamplePojo.class).str1); // ==> "Hello World!"
+    System.out.println(deep.init(ExamplePojo.class).str2); // ==> "DEFAULT"
+
     deep.removeFieldInitializer(String.class);
-    System.out.println(deep.init(C.class).str); // ==> ""
-    // Field initializer for String.class is removed
-    // and there's no custom field initializer for String.class set after that.
-    // In this case, it fallbacks to type initializer.
-    // You haven't added any custom type initializer for String.class thus it'll use the default one.
+    System.out.println(deep.init(ExamplePojo.class).str1); // ==> "DEFAULT"
+    System.out.println(deep.init(ExamplePojo.class).str2); // ==> "DEFAULT"
+
+    deep.removeTypeInitializer(String.class);
+    // You cannot remove Default initializers.
+    System.out.println(deep.init(ExamplePojo.class).str1); // ==> ""
+    System.out.println(deep.init(ExamplePojo.class).str2); // ==> ""
 }
 ```
 

@@ -42,7 +42,7 @@ public class DeepInitializer {
     public void removeTypeInitializer(Class<?> type) {
         List<Map.Entry<Class<?>, BaseTypeInitializer<?>>> target = new ArrayList<>();
         for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : typeInitializer) {
-            if (entry.getKey() == type) {
+            if (entry.getKey() == type && !TypeUtils.isDefaultInitializer(entry.getValue())) {
                 target.add(entry);
             }
         }
