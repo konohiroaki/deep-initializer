@@ -2,14 +2,14 @@ package io.github.konohiroaki.deepinitializer;
 
 class TypeUtils {
 
-    static boolean isPrimitive(Class<?> clazz) {
-        return clazz.isPrimitive();
-    }
-
-    static boolean isPrimitiveWrapper(Class<?> clazz) {
-        return clazz == Double.class || clazz == Float.class
-               || clazz == Long.class || clazz == Integer.class
-               || clazz == Short.class || clazz == Character.class
-               || clazz == Byte.class || clazz == Boolean.class;
+    static boolean isAutoboxable(Class<?> from, Class<?> to) {
+        return from == boolean.class && to == Boolean.class
+               || from == byte.class && to == Byte.class
+               || from == char.class && to == Character.class
+               || from == short.class && to == Short.class
+               || from == int.class && to == Integer.class
+               || from == long.class && to == Long.class
+               || from == float.class && to == Float.class
+               || from == double.class && to == Double.class;
     }
 }

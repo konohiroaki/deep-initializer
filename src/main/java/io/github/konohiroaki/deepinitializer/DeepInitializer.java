@@ -17,20 +17,22 @@ public class DeepInitializer {
 
     public DeepInitializer() {
         addDefaultTypeInitializer();
-        addDefaultFieldInitializer();
     }
 
     private void addDefaultTypeInitializer() {
+        addTypeInitializer(Boolean.class, new BooleanTypeInitializer());
+        addTypeInitializer(Byte.class, new ByteTypeInitializer());
+        addTypeInitializer(Character.class, new CharacterTypeInitializer());
+        addTypeInitializer(Short.class, new ShortTypeInitializer());
+        addTypeInitializer(Integer.class, new IntegerTypeInitializer());
+        addTypeInitializer(Long.class, new LongTypeInitializer());
+        addTypeInitializer(Float.class, new FloatTypeInitializer());
+        addTypeInitializer(Double.class, new DoubleTypeInitializer());
         addTypeInitializer(String.class, new StringTypeInitializer());
         addTypeInitializer(Enum.class, new EnumTypeInitializer());
         addTypeInitializer(List.class, new ListTypeInitializer());
         addTypeInitializer(Set.class, new SetTypeInitializer());
         addTypeInitializer(Map.class, new MapTypeInitializer());
-    }
-
-    private void addDefaultFieldInitializer() {
-        addFieldInitializer(String.class, new StringFieldInitializer());
-        addFieldInitializer(Enum.class, new EnumFieldInitializer());
     }
 
     public <T> void addTypeInitializer(Class<? extends T> type, BaseTypeInitializer<T> init) {
@@ -86,8 +88,7 @@ public class DeepInitializer {
             throw new IllegalArgumentException(clazz + " type not supported");
         }
 
-        Set<Field> fields = ReflectionUtils.getAllFields(clazz);
-        for (Field field : fields) {
+        for (Field field : ReflectionUtils.getAllFields(clazz)) {
             ReflectionUtils.setProperty(value, field, initField(field));
         }
         return value;
@@ -104,12 +105,9 @@ public class DeepInitializer {
 
     private <T> T getTypeValue(Class<T> clazz) {
         for (Map.Entry<Class<?>, BaseTypeInitializer<?>> entry : ListUtils.reverse(typeInitializer)) {
-            if (entry.getKey().isAssignableFrom(clazz)) {
+            if (entry.getKey().isAssignableFrom(clazz) || TypeUtils.isAutoboxable(clazz, entry.getKey())) {
                 return (T) entry.getValue().init((Class) clazz);
             }
-        }
-        if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) new PrimitiveTypeInitializer().init(clazz);
         }
         return null;
     }
@@ -117,12 +115,9 @@ public class DeepInitializer {
     private <T> T getFieldValue(Field field) {
         Class<T> clazz = (Class<T>) field.getType();
         for (Map.Entry<Class<?>, BaseFieldInitializer<?>> entry : ListUtils.reverse(fieldInitializer)) {
-            if (entry.getKey().isAssignableFrom(clazz)) {
+            if (entry.getKey().isAssignableFrom(clazz) || TypeUtils.isAutoboxable(clazz, entry.getKey())) {
                 return (T) entry.getValue().init(field);
             }
-        }
-        if (TypeUtils.isPrimitive(clazz) || TypeUtils.isPrimitiveWrapper(clazz)) {
-            return (T) new PrimitiveFieldInitializer().init(field);
         }
         return getTypeValue(clazz);
     }

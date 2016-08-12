@@ -1,6 +1,6 @@
 package io.github.konohiroaki.deepinitializer;
 
-class StringTypeInitializer extends BaseTypeInitializer<String> {
+public class StringTypeInitializer extends BaseTypeInitializer<String> {
 
     private static final String EMPTY = "";
 

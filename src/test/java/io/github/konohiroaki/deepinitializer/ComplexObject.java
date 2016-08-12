@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.swagger.annotations.ApiModelProperty;
-
 class ComplexObject extends SimpleObject {
 
-    @ApiModelProperty(example = "5")
     private int intA;
     private long longA;
     private double doubleA;
-    @ApiModelProperty(example = "exampleString")
+    private Double wDoubleA;
     private String stringA;
-    @ApiModelProperty(example = "EXECUTE")
     private AccessMode accessModeEnum;
     private List<Integer> integerList;
     private Set<ComplexObject2> accessModeSet;

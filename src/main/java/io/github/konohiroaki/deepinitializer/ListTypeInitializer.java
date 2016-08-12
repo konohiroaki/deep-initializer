@@ -3,7 +3,7 @@ package io.github.konohiroaki.deepinitializer;
 import java.util.ArrayList;
 import java.util.List;
 
-class ListTypeInitializer extends BaseTypeInitializer<List> {
+public class ListTypeInitializer extends BaseTypeInitializer<List> {
 
     @Override
     public List<?> init(Class<List> clazz) {
