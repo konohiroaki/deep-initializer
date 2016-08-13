@@ -10,7 +10,6 @@
 
     <modules>
         <module>deep-initializer-core</module>
-        <module>deep-initializer-swagger</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -43,7 +42,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <swagger.version>1.5.9</swagger.version>
         <junit.version>4.12</junit.version>
     </properties>
 
