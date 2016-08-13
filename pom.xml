@@ -6,8 +6,13 @@
 
     <groupId>io.github.konohiroaki</groupId>
     <artifactId>deep-initializer</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <version>1.1.0</version>
+
+    <modules>
+        <module>deep-initializer-core</module>
+        <module>deep-initializer-swagger</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>Deep Initializer</name>
     <description>Initialize deep bean recursively filling with default values.</description>
