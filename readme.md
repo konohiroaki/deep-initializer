@@ -64,7 +64,7 @@ The parameter you pass to `DeepInitializer#init(Class)` is just a type thus it c
 
 ### Default initializer
 
-Default initializers are set when you `new DeepInitializer()`. You can remove default initializers if you don't want to use it.
+Default initializers are set when you `new DeepInitializer()`. You cannot remove default initializers but you can add your custom initializers and that will be prioritized than the default ones.
 
 #### Type Initializer
 | Type | Value |
